@@ -1,0 +1,25 @@
+name: Validate Gitflow and Semantic Versioning
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:     
+      - name: Validate Semantic Versioning
+        id: semver
+        run: |
+          # Assuming your version file is package.json or other version control file
+          VERSION=$(jq -r '.version' package.json)  # Adjust based on the file format
+          if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Version $VERSION is valid."
+          else
+          echo "Version $VERSION is invalid. Must follow semantic versioning (x.y.z)."
+          exit 1
+          fi
+      - name: Success Message
+        run: echo "All validations passed!"

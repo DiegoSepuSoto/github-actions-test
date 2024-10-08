@@ -20,6 +20,6 @@ jobs:
             echo "Invalid branch name. Must follow Gitflow naming conventions."
             exit 1
           fi
-
+          
       - name: Success Message
         run: echo "All validations passed!"
