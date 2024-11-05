@@ -26,3 +26,4 @@ jobs:
     - name: Run tests
       run: |
         pytest tests/
+        echo '### Hello world! 🚀' >> $GITHUB_STEP_SUMMARY
