@@ -3,12 +3,12 @@ name: Python Test Suite
 on:
   pull_request:
     branches:
-      - master  # Adjust this to your default branch if needed (e.g., 'master')
+      - main  # Adjust this to your default branch if needed (e.g., 'master')
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -23,7 +23,32 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
 
-    - name: Run tests
+    - name: Run tests and generate JUnit XML report
       run: |
-        pytest tests/
-        echo '### Hello world! 🚀' >> $GITHUB_STEP_SUMMARY
+        pytest tests/ --maxfail=1 --disable-warnings --junitxml=pytest_result.xml
+
+    - name: Parse pytest results and add to job summary
+      run: |
+        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        # Parse the pytest JUnit XML file and format it in the job summary
+        python -c '
+import xml.etree.ElementTree as ET
+tree = ET.parse("pytest_result.xml")
+root = tree.getroot()
+
+# Test summary info
+total_tests = root.attrib["tests"]
+failed_tests = root.attrib["failures"]
+passed_tests = int(total_tests) - int(failed_tests)
+
+# Write summary to job summary
+print(f"Total Tests: {total_tests}")
+print(f"Passed: {passed_tests}")
+print(f"Failed: {failed_tests}")
+
+# Add markdown formatted results to the summary
+with open("$GITHUB_STEP_SUMMARY", "a") as summary:
+    summary.write(f"\n\n- **Total Tests:** {total_tests}\n")
+    summary.write(f"- **Passed:** {passed_tests}\n")
+    summary.write(f"- **Failed:** {failed_tests}\n")
+        '
