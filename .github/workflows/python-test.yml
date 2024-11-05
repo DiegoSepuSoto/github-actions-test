@@ -28,6 +28,7 @@ jobs:
         pytest tests/ --maxfail=1 --disable-warnings --junitxml=pytest_result.xml
 
     - name: Parse pytest results and add to job summary
+      if: always()
       run: |
         echo "## Test Results Summary!!!!!" >> $GITHUB_STEP_SUMMARY
         # Parse the pytest JUnit XML file and format it in the job summary
