@@ -27,29 +27,19 @@ jobs:
       run: |
         pytest tests/ --maxfail=1 --disable-warnings --junitxml=pytest_result.xml
 
-    - name: Parse pytest results and add to job summary
+    - name: Convert XML to HTML
+      if: always()
+      run: junit2html report.xml report.html
+
+    - name: Upload report artifact
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: pytest-report
+        path: report.html
+
+    - name: Add report summary to Job Summary
       if: always()
       run: |
-        echo "## Test Results Summary!!!!!" >> $GITHUB_STEP_SUMMARY
-        # Parse the pytest JUnit XML file and format it in the job summary
-        python -c '
-            import xml.etree.ElementTree as ET
-            tree = ET.parse("pytest_result.xml")
-            root = tree.getroot()
-
-            # Test summary info
-            total_tests = root.attrib["tests"]
-            failed_tests = root.attrib["failures"]
-            passed_tests = int(total_tests) - int(failed_tests)
-
-            # Write summary to job summary
-            print(f"Total Tests: {total_tests}")
-            print(f"Passed: {passed_tests}")
-            print(f"Failed: {failed_tests}")
-
-            # Add markdown formatted results to the summary
-            with open("$GITHUB_STEP_SUMMARY", "a") as summary:
-                summary.write(f"\n\n- **Total Tests:** {total_tests}\n")
-                summary.write(f"- **Passed:** {passed_tests}\n")
-                summary.write(f"- **Failed:** {failed_tests}\n")
-                    '
+        echo '### Pytest Results' >> $GITHUB_STEP_SUMMARY
+        echo 'View the detailed [HTML report](./pytest-report/report.html)' >> $GITHUB_STEP_SUMMARY
