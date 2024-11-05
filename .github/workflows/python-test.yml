@@ -3,7 +3,7 @@ name: Python Test Suite
 on:
   pull_request:
     branches:
-      - main  # Adjust this to your default branch if needed (e.g., 'master')
+      - master
 
 jobs:
   test:
