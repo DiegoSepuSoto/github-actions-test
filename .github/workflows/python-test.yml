@@ -32,7 +32,7 @@ jobs:
       run: junit2html report.xml report.html
 
     - name: Upload report artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       if: always()
       with:
         name: pytest-report
